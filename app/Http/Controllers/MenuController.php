@@ -18,6 +18,7 @@ class MenuController extends Controller
             'deskripsi' => 'required|string',
             'harga' => 'required|integer|min:0',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'stok' => 'required|integer|min:0',
         ]);
 
         if ($request->hasFile('foto')) {
@@ -43,5 +44,17 @@ class MenuController extends Controller
 
         return redirect()->route('home')
             ->with('success', 'Menu berhasil dihapus dari database.');
+    }
+
+    public function updateStok(Request $request, Menu $menu)
+    {
+        $request->validate(['stok' => 'required|integer|min:0']);
+        
+        $menu->update([
+            'stok' => $request->stok,
+            'is_sold_out' => $request->stok <= 0 
+        ]);
+
+        return redirect()->back()->with('success', 'Stok berhasil diperbarui!');
     }
 }

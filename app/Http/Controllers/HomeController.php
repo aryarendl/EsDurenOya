@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Setting;
 
 class HomeController extends Controller
 {
@@ -14,8 +15,11 @@ class HomeController extends Controller
     public function index()
     {
         $menus = Menu::orderBy('created_at', 'desc')->get();
+        
+        // Ambil semua setting dari database
+        $settings = Setting::all()->pluck('value', 'key');
 
-        return view('home', compact('menus'));
+        return view('home', compact('menus', 'settings'));
     }
 
     public function showLogin()
