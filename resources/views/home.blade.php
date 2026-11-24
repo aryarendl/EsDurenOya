@@ -15,7 +15,7 @@
                 {{-- Mengambil Judul dan Deskripsi dari Database --}}
                 <h1 class="mb-3">{{ $settings['hero_title'] ?? 'Es Duren Oya' }}</h1>
                 <p class="mb-4">{{ $settings['hero_desc'] ?? '' }}</p>
-                
+
                 <div class="d-flex flex-wrap gap-3">
                     <a href="#menu" class="btn btn-primary-custom"><i class="bi bi-book"></i> Lihat Menu</a>
                     <a href="#kontak" class="btn btn-outline-custom"><i class="bi bi-geo-alt"></i> Lokasi Kami</a>
@@ -38,11 +38,11 @@
             <p>Berbagai pilihan olahan durian yang menggugah selera</p>
 
             @auth
-                @if(Auth::user()->email === 'owner@esdurenoya.com')
-                <button class="btn btn-primary-custom mt-3" data-bs-toggle="modal" data-bs-target="#modalTambahMenu">
-                    <i class="bi bi-plus-circle"></i> Tambah Menu
-                </button>
-                @endif
+            @if(Auth::user()->email === 'owner@esdurenoya.com')
+            <button class="btn btn-primary-custom mt-3" data-bs-toggle="modal" data-bs-target="#modalTambahMenu">
+                <i class="bi bi-plus-circle"></i> Tambah Menu
+            </button>
+            @endif
             @endauth
         </div>
 
@@ -64,50 +64,59 @@
                     @endif
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start">
-                            <h5 class="mb-2">{{ $menu->nama }}</h5>
-                            
+                            <h5 class="mb-2">
+                                {{ $menu->nama }}
+                                {{-- Tampilkan Badge HABIS jika statusnya true --}}
+                                @if($menu->is_sold_out)
+                                <span class="badge bg-danger"
+                                    style="font-size: 0.6rem; vertical-align: middle;">HABIS</span>
+                                @endif
+                            </h5>
+
                             {{-- TOMBOL EDIT & HAPUS (HANYA OWNER) --}}
                             @auth
-                                @if(Auth::user()->email === 'owner@esdurenoya.com')
-                                <div class="d-flex align-items-center">
-                                    {{-- TOMBOL TOGGLE SOLD OUT --}}
-                                    <button onclick="toggleSoldOut({{ $menu->id }})" 
-                                            class="btn btn-sm {{ $menu->is_sold_out ? 'btn-danger' : 'btn-outline-secondary' }} border-0 me-2" 
-                                            title="Ubah Status Ketersediaan">
-                                        <i class="bi bi-power"></i> {{ $menu->is_sold_out ? 'Habis' : 'Tersedia' }}
-                                    </button>
+                            @if(Auth::user()->email === 'owner@esdurenoya.com')
+                            <div class="d-flex align-items-center">
+                                {{-- TOMBOL TOGGLE SOLD OUT --}}
+                                <button onclick="toggleSoldOut({{ $menu->id }})"
+                                    class="btn btn-sm {{ $menu->is_sold_out ? 'btn-danger' : 'btn-outline-secondary' }} border-0 me-2"
+                                    title="Ubah Status Ketersediaan">
+                                    <i class="bi bi-power"></i> {{ $menu->is_sold_out ? 'Habis' : 'Tersedia' }}
+                                </button>
 
-                                    {{-- TOMBOL HAPUS --}}
-                                    <form action="{{ route('menu.destroy', $menu->id) }}" method="POST"
-                                        onsubmit="return confirm('Hapus menu ini dari database?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-outline-danger border-0">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                                @endif
+                                {{-- TOMBOL HAPUS --}}
+                                <form action="{{ route('menu.destroy', $menu->id) }}" method="POST"
+                                    onsubmit="return confirm('Hapus menu ini dari database?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-outline-danger border-0">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            @endif
                             @endauth
                         </div>
                         <p class="desc">{{ $menu->deskripsi }}</p>
                         <div class="price">Rp {{ number_format($menu->harga, 0, ',', '.') }}</div>
-                        
+
                         @auth
-                            @if(Auth::user()->email === 'owner@esdurenoya.com')
-                                <!-- Tampilkan Sisa Stok & Form Update -->
-                                <div class="d-flex align-items-center mt-2 p-2 bg-light rounded">
-                                    <span class="small text-muted me-2">Stok:</span>
-                                    <form action="{{ route('menu.updateStok', $menu->id) }}" method="POST" class="d-flex align-items-center m-0">
-                                        @csrf
-                                        @method('PATCH')
-                                        <input type="number" name="stok" value="{{ $menu->stok }}" class="form-control form-control-sm me-1" style="width: 60px;" min="0">
-                                        <button type="submit" class="btn btn-sm btn-primary py-0 px-2" title="Update Stok">
-                                            <i class="bi bi-check-lg"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            @endif
+                        @if(Auth::user()->email === 'owner@esdurenoya.com')
+                        <!-- Tampilkan Sisa Stok & Form Update -->
+                        <div class="d-flex align-items-center mt-2 p-2 bg-light rounded">
+                            <span class="small text-muted me-2">Stok:</span>
+                            <form action="{{ route('menu.updateStok', $menu->id) }}" method="POST"
+                                class="d-flex align-items-center m-0">
+                                @csrf
+                                @method('PATCH')
+                                <input type="number" name="stok" value="{{ $menu->stok }}"
+                                    class="form-control form-control-sm me-1" style="width: 60px;" min="0">
+                                <button type="submit" class="btn btn-sm btn-primary py-0 px-2" title="Update Stok">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                            </form>
+                        </div>
+                        @endif
                         @endauth
                     </div>
                 </div>
@@ -115,7 +124,7 @@
             @empty
             <div class="col-12 text-center py-5">
                 <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
-                <p class="text-muted mt-3">Belum ada menu di database.</p>
+                <p class="text-muted mt-3">Belum ada menu yang tersedia.</p>
             </div>
             @endforelse
         </div>
@@ -143,15 +152,15 @@
                     {{-- Mengambil Misi dari Database dan memecahnya per baris --}}
                     <ul class="misi-list">
                         @foreach(explode("\n", $settings['misi'] ?? '') as $misi)
-                            @if(trim($misi))
-                                <li>{{ trim($misi) }}</li>
-                            @endif
+                        @if(trim($misi))
+                        <li>{{ trim($misi) }}</li>
+                        @endif
                         @endforeach
                     </ul>
                 </div>
             </div>
         </div>
-        
+
     </div>
 </section>
 
@@ -226,7 +235,8 @@
                     <div>
                         <h6>WhatsApp / Telepon</h6>
                         {{-- Mengambil Kontak WA dari Database --}}
-                        <p><a href="https://wa.me/{{ $settings['kontak_wa'] ?? '' }}" target="_blank" class="text-decoration-none text-dark">
+                        <p><a href="https://wa.me/{{ $settings['kontak_wa'] ?? '' }}" target="_blank"
+                                class="text-decoration-none text-dark">
                                 +{{ $settings['kontak_wa'] ?? '' }}</a></p>
                     </div>
                 </div>
@@ -315,8 +325,8 @@
 
 @push('scripts')
 <script>
-    function toggleSoldOut(id) {
-        fetch(`/kasir/menu/${id}/sold-out`, {
+function toggleSoldOut(id) {
+    fetch(`/kasir/menu/${id}/sold-out`, {
             method: 'PATCH',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -326,11 +336,11 @@
         })
         .then(response => response.json())
         .then(data => {
-            if(data.success) {
+            if (data.success) {
                 window.location.reload(); // Refresh halaman untuk update tampilan
             }
         })
         .catch(error => console.error('Error:', error));
-    }
+}
 </script>
 @endpush

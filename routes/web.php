@@ -19,6 +19,7 @@ Route::post('/logout', [HomeController::class, 'logout'])->name('logout')->middl
     Route::post('/menu', [MenuController::class, 'store'])->name('menu.store');
     Route::delete('/menu/{menu}', [MenuController::class, 'destroy'])->name('menu.destroy');
     Route::patch('/menu/{menu}/update-stok', [MenuController::class, 'updateStok'])->name('menu.updateStok');
+    
 
 // Edit Website / Settings 
     Route::get('/admin/settings', [AdminController::class, 'index'])->name('admin.settings');

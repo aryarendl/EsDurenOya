@@ -8,9 +8,12 @@ use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
-    /**
-     * Simpan menu baru langsung ke database
-     */
+    public function adminIndex()
+    {
+        $menus = Menu::orderBy('id', 'asc')->get();
+        return view('admin.menus', compact('menus'));
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -18,7 +21,7 @@ class MenuController extends Controller
             'deskripsi' => 'required|string',
             'harga' => 'required|integer|min:0',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'stok' => 'required|integer|min:0',
+            'stok' => 'required|integer|min:0', // <-- Validasi stok
         ]);
 
         if ($request->hasFile('foto')) {
@@ -27,13 +30,24 @@ class MenuController extends Controller
 
         Menu::create($data);
 
-        return redirect()->route('home')
-            ->with('success', 'Menu baru berhasil ditambahkan ke database.');
+        return redirect()->back()->with('success', 'Menu baru berhasil ditambahkan.');
     }
 
-    /**
-     * Hapus menu dari database
-     */
+    // METHOD INI YANG PALING PENTING
+    public function updateStok(Request $request, Menu $menu)
+    {
+        $request->validate([
+            'stok' => 'required|integer|min:0'
+        ]);
+        
+        // Paksa update ke database
+        $menu->stok = $request->stok;
+        $menu->is_sold_out = $request->stok <= 0; // Otomatis habis jika 0
+        $menu->save();
+
+        return redirect()->back()->with('success', 'Stok berhasil diperbarui!');
+    }
+
     public function destroy(Menu $menu)
     {
         if ($menu->foto && Storage::disk('public')->exists($menu->foto)) {
@@ -42,19 +56,6 @@ class MenuController extends Controller
 
         $menu->delete();
 
-        return redirect()->route('home')
-            ->with('success', 'Menu berhasil dihapus dari database.');
-    }
-
-    public function updateStok(Request $request, Menu $menu)
-    {
-        $request->validate(['stok' => 'required|integer|min:0']);
-        
-        $menu->update([
-            'stok' => $request->stok,
-            'is_sold_out' => $request->stok <= 0 
-        ]);
-
-        return redirect()->back()->with('success', 'Stok berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Menu berhasil dihapus.');
     }
 }

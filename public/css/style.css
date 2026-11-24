@@ -4,7 +4,7 @@
 
 :root {
     --primary: #2f7a4d;
-    --primary-dark: #1f5a37;
+    --primary-dark:  ;
     --accent: #f5c542;
     --cream: #fdf8ee;
     --soft: #f5f7f4;
@@ -337,5 +337,47 @@ footer a:hover {
 
     section {
         padding: 60px 0;
+    }
+}
+
+/* ============================================
+   LAPORAN PENJUALAN (PRINT)
+   ============================================ */
+@media print {
+    /* Sembunyikan navbar, footer, dan elemen ber-class d-print-none */
+    nav, footer, .d-print-none {
+        display: none !important;
+    }
+    
+    /* Reset background agar putih bersih */
+    body, section, .laporan-section {
+        background: #fff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        min-height: auto !important;
+    }
+    
+    .container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Paksa warna teks jadi hitam (termasuk yg tadinya hijau/biru) */
+    .d-print-block * {
+        color: #000000 !important;
+    }
+
+    /* Pastikan badge tetap terlihat rapi */
+    .badge {
+        border: 1px solid #000 !important;
+        background: transparent !important;
+    }
+
+    /* Pengaturan kertas */
+    @page {
+        margin: 1.5cm;
+        size: A4 portrait;
     }
 }

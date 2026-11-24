@@ -20,15 +20,26 @@
                     <div class="row g-3">
                         @forelse($menus as $menu)
                         <div class="col-md-6">
-                            <div class="card h-100 border-0 shadow-sm menu-item" 
-                                 onclick="addToCart({{ $menu->id }}, '{{ addslashes($menu->nama) }}', {{ $menu->harga }}, {{ $menu->stok }})"
-                                 style="border-radius: 10px; cursor: pointer; transition: 0.2s;"
-                                 onmouseover="this.style.transform='scale(1.02)'" 
-                                 onmouseout="this.style.transform='scale(1)'">
+                            <div class="card h-100 border-0 shadow-sm menu-item"
+                                onclick="addToCart({{ $menu->id }}, '{{ addslashes($menu->nama) }}', {{ $menu->harga }}, {{ $menu->stok }})"
+                                style="border-radius: 10px; cursor: pointer; transition: 0.2s;"
+                                onmouseover="this.style.transform='scale(1.02)'"
+                                onmouseout="this.style.transform='scale(1)'">
                                 <div class="card-body">
-                                    <h6 class="fw-bold mb-1">{{ $menu->nama }}</h6>
-                                    <span class="text-success fw-bold small">Rp {{ number_format($menu->harga, 0, ',', '.') }}</span>
-                                    <div class="text-muted small mt-1">Stok tersedia: <strong>{{ $menu->stok }}</strong></div>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <h6 class="fw-bold mb-1">{{ $menu->nama }}</h6>
+
+                                        {{-- TOMBOL TANDAI HABIS (Hanya muncul jika menu masih tersedia) --}}
+                                        <button onclick="event.stopPropagation(); tandaiHabis({{ $menu->id }})"
+                                            class="btn btn-sm btn-outline-danger border-0 py-0 px-1"
+                                            title="Tandai Menu Habis">
+                                            <i class="bi bi-x-circle"></i> Habis
+                                        </button>
+                                    </div>
+                                    <span class="text-success fw-bold small">Rp
+                                        {{ number_format($menu->harga, 0, ',', '.') }}</span>
+                                    <div class="text-muted small mt-1">Stok tersedia: <strong>{{ $menu->stok }}</strong>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -48,7 +59,7 @@
                     <div id="cart-list" style="max-height: 300px; overflow-y: auto;">
                         <p class="text-muted text-center my-3" id="empty-cart">Belum ada pesanan.</p>
                     </div>
-                    
+
                     <hr>
                     <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
                         <span>Total:</span>
@@ -63,7 +74,7 @@
                         </select>
                     </div>
 
-                     <div id="qris-area" class="mb-3 text-center d-none">
+                    <div id="qris-area" class="mb-3 text-center d-none">
                         <div class="alert alert-info py-2">
                             <i class="bi bi-info-circle-fill"></i> Pembayaran via QRIS / Transfer
                         </div>
@@ -73,7 +84,8 @@
 
                     <div class="mb-3" id="input-cash">
                         <label class="form-label fw-bold">Uang Diterima (Rp)</label>
-                        <input type="number" id="nominal_bayar" class="form-control" oninput="hitungKembalian()" placeholder="Masukkan nominal...">
+                        <input type="number" id="nominal_bayar" class="form-control" oninput="hitungKembalian()"
+                            placeholder="Masukkan nominal...">
                     </div>
 
                     <div class="mb-3 d-flex justify-content-between text-primary fw-bold d-none" id="kembalian-display">
@@ -81,7 +93,8 @@
                         <span id="nominal-kembalian">Rp 0</span>
                     </div>
 
-                    <button class="btn btn-primary-custom w-100 mt-2 py-3" onclick="prosesTransaksi()" id="btn-bayar" disabled>
+                    <button class="btn btn-primary-custom w-100 mt-2 py-3" onclick="prosesTransaksi()" id="btn-bayar"
+                        disabled>
                         <i class="bi bi-check-circle"></i> Proses Pembayaran
                     </button>
                 </div>
@@ -93,68 +106,78 @@
 
 @push('scripts')
 <script>
-    let cart = [];
-    let total = 0;
+let cart = [];
+let total = 0;
 
-    function formatRupiah(angka) {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
-    }
+function formatRupiah(angka) {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+    }).format(angka);
+}
 
-    function addToCart(id, nama, harga, stok) {
-        const existing = cart.find(item => item.id === id);
-        if (existing) {
-            if (existing.jumlah < stok) {
-                existing.jumlah++;
-            } else {
-                alert('Stok tidak mencukupi!');
-            }
+function addToCart(id, nama, harga, stok) {
+    const existing = cart.find(item => item.id === id);
+    if (existing) {
+        if (existing.jumlah < stok) {
+            existing.jumlah++;
         } else {
-            if (stok > 0) {
-                cart.push({ id, nama, harga, jumlah: 1, stok: stok });
-            } else {
-                alert('Stok habis!');
-            }
+            alert('Stok tidak mencukupi!');
         }
-        renderCart();
-    }
-
-    function removeFromCart(id) {
-        cart = cart.filter(item => item.id !== id);
-        renderCart();
-    }
-
-    function reduceQty(id) {
-        const item = cart.find(item => item.id === id);
-        if (item) {
-            item.jumlah--;
-            if (item.jumlah <= 0) removeFromCart(id);
-            else renderCart();
+    } else {
+        if (stok > 0) {
+            cart.push({
+                id,
+                nama,
+                harga,
+                jumlah: 1,
+                stok: stok
+            });
+        } else {
+            alert('Stok habis!');
         }
     }
+    renderCart();
+}
 
-    function renderCart() {
-        const container = document.getElementById('cart-list');
-        const emptyText = document.getElementById('empty-cart');
-        container.innerHTML = '';
-        total = 0;
+function removeFromCart(id) {
+    cart = cart.filter(item => item.id !== id);
+    renderCart();
+}
 
-        if (cart.length === 0) {
-            container.appendChild(emptyText);
-            document.getElementById('total-display').innerText = 'Rp 0';
-            document.getElementById('btn-bayar').disabled = true;
-            if(document.getElementById('metode_pembayaran').value === 'qris') {
-                document.getElementById('qris-area').classList.add('d-none');
-            }
-            return;
+function reduceQty(id) {
+    const item = cart.find(item => item.id === id);
+    if (item) {
+        item.jumlah--;
+        if (item.jumlah <= 0) removeFromCart(id);
+        else renderCart();
+    }
+}
+
+function renderCart() {
+    const container = document.getElementById('cart-list');
+    const emptyText = document.getElementById('empty-cart');
+    container.innerHTML = '';
+    total = 0;
+
+    if (cart.length === 0) {
+        container.appendChild(emptyText);
+        document.getElementById('total-display').innerText = 'Rp 0';
+        document.getElementById('btn-bayar').disabled = true;
+        if (document.getElementById('metode_pembayaran').value === 'qris') {
+            document.getElementById('qris-area').classList.add('d-none');
         }
+        return;
+    }
 
-        cart.forEach(item => {
-            const subtotal = item.harga * item.jumlah;
-            total += subtotal;
-            
-            const disablePlus = item.jumlah >= item.stok ? 'disabled' : '';
-            
-            container.innerHTML += `
+    cart.forEach(item => {
+        const subtotal = item.harga * item.jumlah;
+        total += subtotal;
+
+        const disablePlus = item.jumlah >= item.stok ? 'disabled' : '';
+
+        container.innerHTML += `
                 <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                     <div>
                         <div class="fw-bold">${item.nama}</div>
@@ -167,103 +190,127 @@
                     </div>
                 </div>
             `;
-        });
+    });
 
-        document.getElementById('total-display').innerText = formatRupiah(total);
-        
-        // Cek metode pembayaran saat update keranjang
-        if(document.getElementById('metode_pembayaran').value === 'qris') {
-            updateQRIS();
-            document.getElementById('btn-bayar').disabled = false; 
-        } else {
-            hitungKembalian();
-        }
+    document.getElementById('total-display').innerText = formatRupiah(total);
+
+    // Cek metode pembayaran saat update keranjang
+    if (document.getElementById('metode_pembayaran').value === 'qris') {
+        updateQRIS();
+        document.getElementById('btn-bayar').disabled = false;
+    } else {
+        hitungKembalian();
     }
+}
 
-    function togglePembayaran() {
-        const metode = document.getElementById('metode_pembayaran').value;
-        const inputCash = document.getElementById('input-cash');
-        const qrisArea = document.getElementById('qris-area');
-        const btnBayar = document.getElementById('btn-bayar');
+function togglePembayaran() {
+    const metode = document.getElementById('metode_pembayaran').value;
+    const inputCash = document.getElementById('input-cash');
+    const qrisArea = document.getElementById('qris-area');
+    const btnBayar = document.getElementById('btn-bayar');
 
-        if (metode === 'cash') {
-            inputCash.classList.remove('d-none');
-            qrisArea.classList.add('d-none');
-            hitungKembalian();
-        } else {
-            inputCash.classList.add('d-none');
-            document.getElementById('kembalian-display').classList.add('d-none');
-            qrisArea.classList.remove('d-none');
-            updateQRIS(); 
-            
-            btnBayar.disabled = cart.length === 0; 
-        }
+    if (metode === 'cash') {
+        inputCash.classList.remove('d-none');
+        qrisArea.classList.add('d-none');
+        hitungKembalian();
+    } else {
+        inputCash.classList.add('d-none');
+        document.getElementById('kembalian-display').classList.add('d-none');
+        qrisArea.classList.remove('d-none');
+        updateQRIS();
+
+        btnBayar.disabled = cart.length === 0;
     }
+}
 
-    function updateQRIS() {
-        if (total > 0) {
-            document.getElementById('qris-nominal').innerText = `Total Tagihan: ${formatRupiah(total)}`;
+function updateQRIS() {
+    if (total > 0) {
+        document.getElementById('qris-nominal').innerText = `Total Tagihan: ${formatRupiah(total)}`;
 
-        } else {
-            document.getElementById('qris-nominal').innerText = '';
-                }
-        }
-
-    function hitungKembalian() {
-        const metode = document.getElementById('metode_pembayaran').value;
-        if (metode !== 'cash') return;
-
-        const nominal = parseInt(document.getElementById('nominal_bayar').value) || 0;
-        const kembalian = nominal - total;
-        const kembalianDisplay = document.getElementById('kembalian-display');
-        const btnBayar = document.getElementById('btn-bayar');
-
-        if (nominal >= total && cart.length > 0) {
-            kembalianDisplay.classList.remove('d-none');
-            document.getElementById('nominal-kembalian').innerText = formatRupiah(kembalian);
-            btnBayar.disabled = false;
-        } else {
-            kembalianDisplay.classList.add('d-none');
-            btnBayar.disabled = true;
-        }
+    } else {
+        document.getElementById('qris-nominal').innerText = '';
     }
+}
 
-    function prosesTransaksi() {
-        const metode = document.getElementById('metode_pembayaran').value;
-        const nominal = metode === 'cash' ? parseInt(document.getElementById('nominal_bayar').value) : total;
-        
-        const data = {
-            _token: '{{ csrf_token() }}',
-            items: cart,
-            total_harga: total,
-            nominal_bayar: nominal,
-            metode_pembayaran: metode
-        };
+function hitungKembalian() {
+    const metode = document.getElementById('metode_pembayaran').value;
+    if (metode !== 'cash') return;
 
-        const btn = document.getElementById('btn-bayar');
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Memproses...';
-        btn.disabled = true;
+    const nominal = parseInt(document.getElementById('nominal_bayar').value) || 0;
+    const kembalian = nominal - total;
+    const kembalianDisplay = document.getElementById('kembalian-display');
+    const btnBayar = document.getElementById('btn-bayar');
 
-        fetch('{{ route('kasir.store') }}', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(res => {
-            if(res.success) {
-                alert('Transaksi Berhasil!');
-                window.location.reload();
-            } else {
-                alert(res.message || 'Terjadi kesalahan');
-                btn.innerHTML = '<i class="bi bi-check-circle"></i> Proses Pembayaran';
+    if (nominal >= total && cart.length > 0) {
+        kembalianDisplay.classList.remove('d-none');
+        document.getElementById('nominal-kembalian').innerText = formatRupiah(kembalian);
+        btnBayar.disabled = false;
+    } else {
+        kembalianDisplay.classList.add('d-none');
+        btnBayar.disabled = true;
+    }
+}
+
+function prosesTransaksi() {
+    const metode = document.getElementById('metode_pembayaran').value;
+    const nominal = metode === 'cash' ? parseInt(document.getElementById('nominal_bayar').value) : total;
+
+    const data = {
+        _token: '{{ csrf_token() }}',
+        items: cart,
+        total_harga: total,
+        nominal_bayar: nominal,
+        metode_pembayaran: metode
+    };
+
+    const btn = document.getElementById('btn-bayar');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Memproses...';
+    btn.disabled = true;
+
+    // PERHATIKAN BARIS INI, HARUS SATU BARIS
+    fetch('{{ route('kasir.store') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.success) {
+            alert('Transaksi Berhasil!');
+            window.location.reload();
+        } else {
+            alert(res.message || 'Terjadi kesalahan');
+            btn.innerHTML = '<i class="bi bi-check-circle"></i> Proses Pembayaran';
+        }
+    })
+    .catch(err => {
+        alert('Gagal memproses transaksi');
+        console.error(err);
+        btn.innerHTML = '<i class="bi bi-check-circle"></i> Proses Pembayaran';
+    });
+}
+
+    function tandaiHabis(id) {
+        if (!confirm('Tandai menu ini sebagai HABIS? Menu akan hilang dari tampilan pelanggan.')) return;
+
+        fetch(`/kasir/menu/${id}/sold-out`, {
+            method: 'PATCH',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             }
         })
-        .catch(err => {
-            alert('Gagal memproses transaksi');
-            console.error(err);
-            btn.innerHTML = '<i class="bi bi-check-circle"></i> Proses Pembayaran';
-        });
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                window.location.reload(); // Refresh halaman kasir untuk menghilangkan menu
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
 </script>
 @endpush

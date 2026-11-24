@@ -17,6 +17,6 @@ class Menu extends Model
         'harga',
         'foto',
         'is_sold_out',
-        'sotk',
+        'stok',
     ];
 }

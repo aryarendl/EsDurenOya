@@ -16,5 +16,7 @@ class Menu extends Model
         'deskripsi',
         'harga',
         'foto',
+        'is_sold_out',
+        'stok'
     ];
 }

@@ -80,27 +80,47 @@
 @yield('content')
 
 <!-- Footer -->
-<footer>
+<footer style="background-color: #1f5a37; color: #ffffff; padding: 50px 0 20px; margin-top: 40px;">
     <div class="container">
         <div class="row g-4">
             <div class="col-md-4">
-                <h5><i class="bi bi-flower1"></i> Es Duren Oya</h5>
-                <p>Usaha kuliner olahan durian dengan cita rasa autentik dan bahan berkualitas, berlokasi di Cimahi Selatan.</p>
+                <h5 style="color: #ffffff; font-weight: 600; margin-bottom: 16px;">
+                    <i class="bi bi-flower1" style="color: #f5c542;"></i> Es Duren Oya
+                </h5>
+                <p style="color: #e2e8f0; font-size: 0.95rem; line-height: 1.6;">
+                    Usaha kuliner olahan durian dengan cita rasa autentik dan bahan berkualitas, berlokasi di Cimahi Selatan.
+                </p>
             </div>
+            
             <div class="col-md-4">
-                <h5>Alamat</h5>
-                <p><i class="bi bi-geo-alt-fill"></i> Jl. Sadarmanah No. 30, Leuwigajah,<br>
-                   Kec. Cimahi Selatan, Kota Cimahi,<br>Jawa Barat 40532</p>
+                <h5 style="color: #ffffff; font-weight: 600; margin-bottom: 16px;">Alamat</h5>
+                <p style="color: #e2e8f0; font-size: 0.95rem; line-height: 1.6;">
+                    <i class="bi bi-geo-alt-fill" style="color: #f5c542;"></i> Jl. Sadarmanah No. 30, Leuwigajah,<br>
+                    Kec. Cimahi Selatan, Kota Cimahi,<br>Jawa Barat 40532
+                </p>
             </div>
+            
             <div class="col-md-4">
-                <h5>Kontak</h5>
-                <p><i class="bi bi-whatsapp"></i> <a href="https://wa.me/{{ $settings['kontak_wa'] ?? '' }}" target="_blank">+{{ $settings['kontak_wa'] ?? '' }}</a></p>
-                <p><i class="bi bi-instagram"></i> <a href="#">{{ $settings['kontak_ig'] ?? '' }}</a></p>
-                <p><i class="bi bi-envelope-fill"></i> <a href="mailto:{{ $settings['kontak_email'] ?? '' }}">{{ $settings['kontak_email'] ?? '' }}</a></p>
+                <h5 style="color: #ffffff; font-weight: 600; margin-bottom: 16px;">Kontak</h5>
+                <p style="color: #e2e8f0; margin-bottom: 8px;">
+                    <i class="bi bi-whatsapp" style="color: #f5c542;"></i> 
+                    <a href="https://wa.me/{{ $settings['kontak_wa'] ?? '' }}" target="_blank" style="color: #e2e8f0; text-decoration: none;">+{{ $settings['kontak_wa'] ?? '' }}</a>
+                </p>
+                <p style="color: #e2e8f0; margin-bottom: 8px;">
+                    <i class="bi bi-instagram" style="color: #f5c542;"></i> 
+                    <a href="#" style="color: #e2e8f0; text-decoration: none;">{{ $settings['kontak_ig'] ?? '' }}</a>
+                </p>
+                <p style="color: #e2e8f0; margin-bottom: 8px;">
+                    <i class="bi bi-envelope-fill" style="color: #f5c542;"></i> 
+                    <a href="mailto:{{ $settings['kontak_email'] ?? '' }}" style="color: #e2e8f0; text-decoration: none;">{{ $settings['kontak_email'] ?? '' }}</a>
+                </p>
             </div>
         </div>
-        <div class="footer-bottom">
-            &copy; {{ date('Y') }} Es Duren Oya. All rights reserved.
+        
+        <div style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 20px; margin-top: 30px; text-align: center;">
+            <p style="color: #e2e8f0; font-size: 0.85rem; margin: 0;">
+                &copy; {{ date('Y') }} Es Duren Oya. All rights reserved.
+            </p>
         </div>
     </div>
 </footer>

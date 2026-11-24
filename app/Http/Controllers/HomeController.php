@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Setting;
 
 class HomeController extends Controller
 {
@@ -14,7 +14,18 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $menus = Menu::orderBy('created_at', 'desc')->get();
+        // Cek apakah user yang login adalah Owner
+        $isOwner = Auth::check() && Auth::user()->email === 'owner@esdurenoya.com';
+
+        if ($isOwner) {
+            // Jika Owner: Tampilkan SEMUA menu (termasuk yang habis) agar bisa dikelola
+            $menus = Menu::orderBy('created_at', 'desc')->get();
+        } else {
+            // Jika Pelanggan/Guest: Hanya tampilkan menu yang TERSEDIA (is_sold_out = 0)
+            $menus = Menu::where('is_sold_out', false)
+                         ->orderBy('created_at', 'desc')
+                         ->get();
+        }
         
         // Ambil semua setting dari database
         $settings = Setting::all()->pluck('value', 'key');
